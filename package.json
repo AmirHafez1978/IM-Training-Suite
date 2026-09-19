@@ -1,0 +1,89 @@
+{
+  "name": "im-training-suite",
+  "productName": "Internal Medicine Training Suite",
+  "version": "19.0.0",
+  "description": "Internal Medicine Clinical Training Console — desktop (Windows/macOS) and installable web app.",
+  "author": "MUCOM Internal Medicine",
+  "private": true,
+  "main": "electron/main.js",
+  "scripts": {
+    "import": "node tools/import-bundle.js",
+    "serve": "node tools/serve.js",
+    "start": "electron .",
+    "dist:win": "electron-builder --win",
+    "dist:mac": "electron-builder --mac",
+    "dist": "electron-builder --win --mac"
+  },
+  "devDependencies": {
+    "electron": "^38.0.0",
+    "electron-builder": "^26.0.0",
+    "sharp": "^0.34.0"
+  },
+  "build": {
+    "appId": "iq.edu.uomustansiriyah.imtrainingsuite",
+    "productName": "Internal Medicine Training Suite",
+    "copyright": "Al-Mustansiriya University College of Medicine",
+    "directories": {
+      "output": "dist",
+      "buildResources": "build"
+    },
+    "files": [
+      "app/**/*",
+      "electron/**/*",
+      "package.json"
+    ],
+    "win": {
+      "icon": "build/icon.png",
+      "target": [
+        {
+          "target": "nsis",
+          "arch": [
+            "x64"
+          ]
+        },
+        {
+          "target": "portable",
+          "arch": [
+            "x64"
+          ]
+        }
+      ]
+    },
+    "nsis": {
+      "oneClick": false,
+      "perMachine": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "IM Training Suite"
+    },
+    "portable": {
+      "artifactName": "${productName}-${version}-Portable.${ext}"
+    },
+    "mac": {
+      "icon": "build/icon.png",
+      "category": "public.app-category.education",
+      "identity": "-",
+      "hardenedRuntime": false,
+      "target": [
+        {
+          "target": "dmg",
+          "arch": [
+            "universal"
+          ]
+        },
+        {
+          "target": "zip",
+          "arch": [
+            "universal"
+          ]
+        }
+      ]
+    }
+  },
+  "allowScripts": {
+    "electron@38.8.6": true,
+    "sharp@0.34.5": true,
+    "electron-winstaller@5.4.0": true
+  }
+}

@@ -1,0 +1,59 @@
+# Builds the desktop apps on GitHub's own machines.
+#   macOS  -> .dmg + .zip (one "universal" app for Intel and Apple Silicon Macs)
+#   Windows -> Setup .exe + Portable .exe
+# Run it from the repository's "Actions" tab -> "Build desktop apps" -> "Run workflow",
+# or it runs automatically when the app files change. Download the results from the
+# run's "Artifacts" section at the bottom of the run page.
+name: Build desktop apps
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'app/**'
+      - 'electron/**'
+      - 'build/icon.png'
+      - 'package.json'
+      - '.github/workflows/build.yml'
+
+jobs:
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: macos-latest
+            target: --mac
+            artifact: IM-Training-Suite-macOS
+            files: |
+              dist/*.dmg
+              dist/*.zip
+          - os: windows-latest
+            target: --win
+            artifact: IM-Training-Suite-Windows
+            files: |
+              dist/*.exe
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install build tools
+        run: npm ci --no-audit --no-fund
+
+      - name: Build
+        run: npx electron-builder ${{ matrix.target }} --publish never
+        env:
+          CSC_IDENTITY_AUTO_DISCOVERY: 'false'
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.artifact }}
+          path: ${{ matrix.files }}
+          retention-days: 30
+          if-no-files-found: error
